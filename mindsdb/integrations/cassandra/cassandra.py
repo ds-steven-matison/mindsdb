@@ -12,18 +12,20 @@ class CassandraConnectionChecker:
 
     def check_connection(self):
         try:
-            auth_provider = PlainTextAuthProvider(
-                username=self.user, password=self.password
-            )
-            cluster = Cluster([self.host], port=self.port, auth_provider=auth_provider)
+            cloud_config= {
+                    'secure_connect_bundle': '/tmp/secure-connect-mindsdb.zip'
+            }
+            auth_provider = PlainTextAuthProvider('XsXDMLBtpoTkqwebibuBjSKQ', 'd_9igJodZk.RD01zxJIvRO4MJTWw12EHUA-HTN02--,F68bbq7aQ3TbKR+7aJnWYhUuUktDttwHask02y0CsYvNHQEqZ46XL7C8,IM5,Dp6lWNP5JZzUF2rBJ3hgtgeZ')
+            cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider,protocol_version=4)
             session = cluster.connect()
 
             if isinstance(self.keyspace, str) and len(self.keyspace) > 0:
                 session.set_keyspace(self.keyspace)
 
-            session.execute('SELECT COUNT (1) FROM system.local;').all()
+            session.execute('select release_version from system.local').one()
 
             connected = True
         except Exception:
             connected = False
         return connected
+
